@@ -1,0 +1,531 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Design Build Acoustics — Coming Soon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --white: #f5f5f2;
+      --dim: rgba(0,0,0,0.78);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Raleway', sans-serif;
+      background: #000;
+      color: var(--white);
+    }
+
+    /* ── VIDEO BACKGROUND ── */
+    .video-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .video-wrap video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* 78% black tint overlay */
+    .video-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+    }
+
+    /* subtle noise grain over everything */
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .stage {
+      position: relative;
+      z-index: 2;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      gap: 0;
+    }
+
+    /* ── LOGO LOCKUP ── */
+    .logo-wrap {
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: fadeUp 1.2s ease forwards 0.4s;
+    }
+
+    .logo-img {
+      height: 160px;
+      object-fit: contain;
+    }
+
+    /* fallback text logo if image missing */
+    .logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      letter-spacing: 0.18em;
+      line-height: 1;
+      color: var(--white);
+    }
+
+    .logo-sub {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      font-size: clamp(0.65rem, 1.8vw, 0.85rem);
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-top: 0.5rem;
+    }
+
+    /* ── GOLD RULE ── */
+    .rule {
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 2.2rem auto;
+      animation: expandRule 1.4s ease forwards 1s;
+    }
+
+    /* ── UNDER CONSTRUCTION ── */
+    .uc-wrap {
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 1.3s;
+    }
+
+    .uc-tag {
+      display: inline-block;
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      font-family: 'Raleway', sans-serif;
+      font-weight: 600;
+      font-size: clamp(0.6rem, 1.6vw, 0.75rem);
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.6rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.4rem, 4vw, 2.4rem);
+      letter-spacing: 0.1em;
+      color: var(--white);
+      line-height: 1.15;
+      max-width: 700px;
+    }
+
+    .body-copy {
+      margin-top: 1rem;
+      font-weight: 300;
+      font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+      letter-spacing: 0.06em;
+      line-height: 1.8;
+      color: rgba(245,245,242,0.65);
+      max-width: 480px;
+    }
+
+    /* ── CONTACT STRIP ── */
+    .contact-strip {
+      margin-top: 2.8rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 2.4rem;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 1.8s;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: clamp(0.75rem, 1.6vw, 0.85rem);
+      letter-spacing: 0.06em;
+      color: rgba(245,245,242,0.8);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .contact-item:hover { color: var(--gold-light); }
+
+    .contact-item svg {
+      width: 15px;
+      height: 15px;
+      stroke: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* ── BOTTOM BAR ── */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 3;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      border-top: 1px solid rgba(201,168,76,0.18);
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 2.4s;
+    }
+
+    .bottom-bar p {
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(245,245,242,0.35);
+    }
+
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      color: rgba(245,245,242,0.35);
+      text-transform: uppercase;
+    }
+    .location svg { width:11px; height:11px; stroke: var(--gold); opacity:0.7; }
+
+    /* ── ANIMATED SOUND WAVE ── */
+    .wave-wrap {
+      position: fixed;
+      bottom: 3.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 22px;
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 2.6s;
+    }
+
+    .bar {
+      width: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+      opacity: 0.5;
+      animation: pulse var(--dur, 1s) ease-in-out infinite alternate;
+      animation-delay: var(--delay, 0s);
+    }
+
+    /* ── KEYFRAMES ── */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    @keyframes expandRule {
+      to { width: min(280px, 60vw); }
+    }
+    @keyframes pulse {
+      from { height: 4px; }
+      to   { height: 18px; }
+    }
+
+    /* video placeholder notice */
+    .video-notice {
+      position: fixed;
+      top: 1rem; right: 1rem;
+      z-index: 10;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid rgba(201,168,76,0.4);
+      color: rgba(245,245,242,0.6);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      padding: 0.4rem 0.8rem;
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    @media (max-width: 480px) {
+      .bottom-bar { flex-direction: column; gap: 0.3rem; text-align: center; }
+      .logo-img { height: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Design Build Acoustics — Coming Soon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Raleway:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ice: #8ec9ff;
+      --ice-light: #bfe2ff;
+      --white: #f5f5f2;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Raleway', sans-serif;
+      background: #000;
+      color: var(--white);
+    }
+
+    /* BACKGROUND IMAGE + 40% BLACK TINT */
+    .bg-wrap {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image: url('background.jpg'); /* <- your file name */
+      background-size: cover;
+      background-position: center;
+    }
+
+    .bg-wrap::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.40);
+    }
+
+    /* subtle grain */
+    .grain {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px;
+    }
+
+    /* MAIN LAYOUT */
+    .stage {
+      position: relative;
+      z-index: 2;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    /* LOGO */
+    .logo-wrap {
+      opacity: 0;
+      transform: translateY(-20px);
+      animation: fadeUp 1.2s ease forwards 0.4s;
+    }
+
+    .logo-img {
+      height: 160px;
+      object-fit: contain;
+    }
+
+    .logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 6rem);
+      letter-spacing: 0.18em;
+      color: var(--white);
+    }
+
+    .logo-sub {
+      font-family: 'Raleway', sans-serif;
+      font-weight: 300;
+      font-size: clamp(0.65rem, 1.8vw, 0.85rem);
+      letter-spacing: 0.45em;
+      text-transform: uppercase;
+      color: var(--ice);
+      margin-top: 0.5rem;
+    }
+
+    /* ICE BLUE RULE */
+    .rule {
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--ice), transparent);
+      margin: 2.2rem auto;
+      animation: expandRule 1.4s ease forwards 1s;
+    }
+
+    /* UNDER CONSTRUCTION */
+    .uc-wrap {
+      opacity: 0;
+      animation: fadeUp 1.2s ease forwards 1.3s;
+    }
+
+    .uc-tag {
+      display: inline-block;
+      border: 1px solid var(--ice);
+      color: var(--ice-light);
+      font-weight: 600;
+      font-size: clamp(0.6rem, 1.6vw, 0.75rem);
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      padding: 0.55rem 1.6rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .headline {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(1.4rem, 4vw, 2.4rem);
+      letter-spacing: 0.1em;
+      color: var(--white);
+      line-height: 1.15;
+      max-width: 700px;
+    }
+
+    .body-copy {
+      margin-top: 1rem;
+      font-weight: 300;
+      font-size: clamp(0.8rem, 1.8vw, 0.95rem);
+      letter-spacing: 0.06em;
+      line-height: 1.8;
+      color: rgba(245,245,242,0.75);
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* BOTTOM CONTACT BAR */
+    .bottom-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 3;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 1.5rem;
+      justify-content: center;
+      align-items: center;
+      padding: 0.9rem 1.5rem;
+      border-top: 1px solid rgba(142,201,255,0.25);
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      animation: fadeIn 1s ease forwards 2.4s;
+    }
+
+    .bottom-bar p {
+      font-size: 0.68rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(245,245,242,0.7);
+      text-align: center;
+    }
+
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      color: rgba(245,245,242,0.7);
+      text-transform: uppercase;
+    }
+
+    .location svg {
+      width: 11px;
+      height: 11px;
+      stroke: var(--ice);
+      opacity: 0.9;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes expandRule { to { width: min(280px, 60vw); } }
+
+    @media (max-width: 600px) {
+      .logo-img { height: 110px; }
+      .bottom-bar { padding: 0.8rem 1rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- BACKGROUND IMAGE + TINT -->
+  <div class="bg-wrap"></div>
+
+  <!-- GRAIN -->
+  <div class="grain"></div>
+
+  <!-- MAIN CONTENT -->
+  <div class="stage">
+
+    <!-- LOGO -->
+    <div class="logo-wrap">
+      <img src="DBA-WHITE.png" alt="Design Build Acoustics" class="logo-img"
+           onerror="this.style.display='none'; document.getElementById('text-logo').style.display='block'">
+      <div id="text-logo" style="display:none;">
+        <div class="logo-text">DBA</div>
+        <div class="logo-sub">Design Build Acoustics</div>
+      </div>
+    </div>
+
+    <!-- ICE BLUE RULE -->
+    <div class="rule"></div>
+
+    <!-- UNDER CONSTRUCTION -->
+    <div class="uc-wrap">
+      <div class="uc-tag">■  Under Construction  ■</div>
+
+      <div class="headline">Something Exceptional<br>Is Taking Shape</div>
+
+      <p class="body-copy">
+        We're putting the finishing touches on our new website.
+        In the meantime, we're fully operational — get in touch
+        to discuss your acoustic project.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM CONTACT BAR -->
+  <div class="bottom-bar">
+    <p>&copy; 2025 Design Build Acoustics Ltd</p>
+    <div class="location">
+      <svg fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+      45 Warren Lane, Stanway, Essex CO3 0LL
+    </div>
+    <p>020 8050 4916 • info@designbuildacoustics.com</p>
+  </div>
+
+</body>
+</html>
